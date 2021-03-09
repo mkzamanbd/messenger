@@ -1,83 +1,73 @@
-<!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <!-- CSRF Token -->
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>Login || Messenger.com</title>
-        <!-- Styles -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+@extends('layouts.app')
 
-    </head>
-    <body>
-        <section class="full-wrapper">
-            <div class="wrapper">
-                <!-- alert message -->
-                @error('email')
-                    <div class="alert alert-danger">
-                        {{ $message }}
-                    </div>
-                @enderror
-                <!-- End: alert message -->
+@section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">{{ __('Login') }}</div>
 
-                <!-- Title -->
-                <h2 class="mt-5">Login</h2>
-                <!-- End: title -->
+                <div class="card-body">
+                    <form method="POST" action="{{ route('login') }}">
+                        @csrf
 
-                <!-- Sign in form -->
-                <form method="POST" action="{{ route('login') }}">
-                    @csrf
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa fa-user-circle-o"></i></span>
-                        <input type="text" name="email" class="form-control @error('email') is-invalid @enderror" value="admin@messenger.com" placeholder="Email" required>
-                    </div>
+                        <div class="form-group row">
+                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
 
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fa fa-key"></i></span>
-                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Password" value="12345678" required>
-                        <a href="#" class="pass-eye" onclick="show()"><i class="fa fa-eye"></i></a>
-                    </div>
+                            <div class="col-md-6">
+                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
 
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }} id="flexCheckChecked">
-                        <label class="form-check-label" for="flexCheckChecked">Remember Me</label>
-                    </div>
+                                @error('email')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
 
-                    <div class="form-group d-block">
-                        <button type="submit" class="btn mt-3 signin-btn">Login</button>
-                    </div>
-                </form>
-                <!-- End: Sign in form -->
+                        <div class="form-group row">
+                            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
 
-                <!-- sign in text -->
-                <a href="">Forgot password</a>
-                <!-- End: sign In text -->
+                            <div class="col-md-6">
+                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
 
-                <!-- sign in footer -->
-                <div class="footer">
-                    <p>&copy; {{ date('Y') }} <a href="#">Zaman</a>. All rights reserved.</p>
-                    <p>Develop by <a href="http://Zaman.com/" target="_blank">Zaman</a></p>
+                                @error('password')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-md-6 offset-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+
+                                    <label class="form-check-label" for="remember">
+                                        {{ __('Remember Me') }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mb-0">
+                            <div class="col-md-8 offset-md-4">
+                                <button type="submit" class="btn btn-primary">
+                                    {{ __('Login') }}
+                                </button>
+
+                                @if (Route::has('password.request'))
+                                    <a class="btn btn-link" href="{{ route('password.request') }}">
+                                        {{ __('Forgot Your Password?') }}
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    </form>
                 </div>
-                <!-- End: sign in footer -->
             </div>
-        </section>
-
-        <!-- javascript -->
-        <script>
-            function show() {
-                let input = document.getElementsByName("password")[0],
-                    type = input.getAttribute("type");
-
-                if(type === "password") {
-                    input.type = "text";
-                    document.querySelector('.fa-eye').classList.add("fa-eye-slash");
-                } else {
-                    input.type = "password";
-                    document.querySelector('.fa-eye').classList.remove("fa-eye-slash");
-                }
-            }
-        </script>
-    </body>
-</html>
+        </div>
+    </div>
+</div>
+@endsection

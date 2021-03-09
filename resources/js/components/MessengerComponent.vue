@@ -3,8 +3,8 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="card-header">Users</div>
-                <div class="content">
-                    <div class="card p-2 mt-2 btn text-left" v-for="(user, index) in users" :key="index">
+                <div class="content" style="height: 450px; overflow-y: scroll; overflow-x: hidden">
+                    <div class="card p-2 mt-2 btn text-start" v-for="(user, index) in users" :key="index">
                         <div class="row" @click="selectUser(user)">
                             <div class="col-3">
                                 <img :src="'https://ui-avatars.com/api/?name=' + user.name" alt="" class="rounded-circle">
@@ -16,53 +16,29 @@
                         </div>
                     </div>
                 </div>
-                
+
             </div>
             <div class="col-md-8">
                 <div class="card-header">Messages</div>
-                <div class="content mt-2">
-                    <div class="message-box">
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <div class="text-right bg-success rounded p-3">
-                                    <p>An item</p>
-                                    <p>Time: 5 min ago</p>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="bg-secondary rounded p-3">
-                                    <p>An item</p>
-                                    <p>Time: 5 min ago</p>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="bg-secondary rounded p-3">
-                                    <p>An item</p>
-                                    <p>Time: 5 min ago</p>
-                                </div>
-                            </li>
-
-                            <li class="list-group-item">
-                                <div class="text-right bg-success rounded p-3">
-                                    <p>An item</p>
-                                    <p>Time: 5 min ago</p>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="bg-secondary rounded p-3">
-                                    <p>An item</p>
-                                    <p>Time: 5 min ago</p>
-                                </div>
-                            </li>
-                        </ul>  
-                    </div>
-                    <form action="#" class="mt-3">
-                        <div class="form-group">
-                            <textarea type="text" v-model="message" class="form-control" @keydown.enter="submit" rows="2"></textarea>
+                <div class="card-body p-0" style="height: 450px; overflow-y: scroll; overflow-x: hidden">
+                    <div class="content mt-2" v-if="selected_user">
+                        <div class="message" id="message">
+                            <ul class="list-group">
+                                <li class="list-group-item" v-for="(message, index) in messages" :key="index">
+                                    <div class="rounded p-3" style="width: 70%" :class="`${message.to === selected_user.id ? 'text-right float-right bg-to' : 'bg-from'}`">
+                                        <p>{{ message.text }}</p>
+                                        <p>Time: {{ message.created_at }}</p>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
-                    </form>
+                        <form action="#" class="mt-3">
+                            <div class="form-group">
+                                <textarea type="text" v-model="form.text" class="form-control" @keydown.enter="submit" rows="2"></textarea>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                
             </div>
         </div>
     </div>
@@ -71,25 +47,55 @@
 <script>
     export default {
         props:{
-            users:{default:[], type:Array}
+            users:{ type:Array, required:true }
         },
         data(){
             return{
-                message: ''
+                messages: [],
+                form:{
+                    text: '',
+                    user_id: '',
+                },
+                selected_user: ''
             }
         },
-        mounted() {
-
-        },
         methods:{
-            selectUser(id){
-                console.log(id)
+            // scrollToBottom() {
+            //     setTimeout(() => {
+            //         this.$refs.feed.scrollTop = this.$refs.feed.scrollHeight - this.$refs.feed.clientHeight;
+            //     }, 50);
+            // },
+            selectUser(user){
+                // console.log(user)
+                this.form.user_id = user.id;
+                this.selected_user = user;
+                this.getMessages();
+            },
+            getMessages(){
+                axios.get(baseURL + '/get-message?id=' + this.selected_user.id).then(response =>{
+                    this.messages = response.data;
+                }).catch(error =>{
+                    console.log(error);
+                })
             },
             submit(e){
                 e.preventDefault();
-                console.log(this.message)
-                this.message = ''
+                axios.post(baseURL + '/send-message',this.form).then(response =>{
+                    console.log(response.data);
+                    this.getMessages();
+                    this.form.text = '';
+                }).catch(error =>{
+                    console.log(error);
+                })
             }
+        },
+        watch: {
+            // contact(selected_user) {
+            //     this.scrollToBottom();
+            // },
+            // messages(messages) {
+            //     this.scrollToBottom();
+            // }
         }
     }
 </script>
