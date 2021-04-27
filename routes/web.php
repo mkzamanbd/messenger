@@ -1,8 +1,5 @@
 <?php
 
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,11 +14,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return redirect()->route('home');
+    return view('welcome');
 });
 
-Auth::routes();
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
-Route::get('home', [UserController::class, 'index'])->name('home');
-Route::get('get-message', [MessageController::class, 'index']);
-Route::post('send-message', [MessageController::class, 'store']);
+require __DIR__.'/auth.php';
